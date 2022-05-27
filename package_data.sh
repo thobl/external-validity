@@ -73,6 +73,6 @@ create_zip "output_data"
 
 ######################################################################
 # data export (combined csv)
-mkdir -p data_packages/data_export/
-cp R/output/*.csv data_packages/data_export/
-create_zip "data_export"
+cp R/output/data_export.csv data_packs/graph_stats.csv
+cp R/output/data_export_real.csv data_packs/graph_stats_real.csv
+cp R/output/data_export_gen.csv data_packs/graph_stats_gen.csv
