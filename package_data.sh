@@ -24,13 +24,13 @@ cp_edge_list_pack() {
 cp_edge_list_pack "er_n*m=250*" er
 cp_edge_list_pack "er_n*m=500*" er_deg_20
 
-# cp_edge_list_pack "cl_n*deg=10*" cl
-# cp_edge_list_pack "cl_n*deg=20*" cl_deg_20
+cp_edge_list_pack "cl_n*deg=10*" cl
+cp_edge_list_pack "cl_n*deg=20*" cl_deg_20
 
-# cp_edge_list_pack "girg_n*deg=10*[0-9]" girg
-# cp_edge_list_pack "girg_n*deg=20*[0-9]" girg_deg_20
-# cp_edge_list_pack "girg_n*_square" girg_square
-# cp_edge_list_pack "girg_deg_scaling_n*" girg_deg_scaling
+cp_edge_list_pack "girg_n*deg=10*[0-9]" girg
+cp_edge_list_pack "girg_n*deg=20*[0-9]" girg_deg_20
+cp_edge_list_pack "girg_n*_square" girg_square
+cp_edge_list_pack "girg_deg_scaling_n*" girg_deg_scaling
 
 
 ######################################################################
