@@ -40,6 +40,15 @@ To install the required R-packages, run the following command.
 R -e 'install.packages(c("ggplot2", "egg", "xtable", "extrafont", "plyr", "dplyr", "reshape2", "grid", "ggpubr", "GGally", "showtext", "plotly", "igraph"), repos="https://cloud.r-project.org/")'
 ```
 
+Additionally, the file `lmroman10-regular.otf` must be available (and
+finale) in your system.  You can, e.g., just download it as follows.
+
+```terminal
+wget http://www.gust.org.pl/projects/e-foundry/latin-modern/download/lm2.004otf.zip &&\
+    unzip -p lm2.004otf.zip lmroman10-regular.otf > lmroman10-regular.otf &&\
+    rm lm2.004otf.zip
+```
+
 ### Building ###
 
 To build the c++ code, you can simply run the `build.sh` script.
