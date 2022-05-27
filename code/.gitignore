@@ -1,0 +1,9 @@
+debug
+release
+compile_commands.json
+.clangd
+README.html
+.cache
+.projectile
+launch.json
+.log

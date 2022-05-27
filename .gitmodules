@@ -1,0 +1,9 @@
+[submodule "run"]
+	path = run
+	url = https://github.com/thobl/run.git
+[submodule "quick-cliques"]
+	path = quick-cliques
+	url = https://github.com/darrenstrash/quick-cliques.git
+[submodule "girgs"]
+	path = girgs
+	url = https://github.com/chistopher/girgs.git

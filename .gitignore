@@ -1,0 +1,6 @@
+__pycache__
+output_data*
+input_data
+.Rhistory
+.cache
+data_packages
