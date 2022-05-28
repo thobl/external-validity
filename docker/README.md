@@ -1,55 +1,81 @@
-# Basic Steps #
+# Usage #
 
-## Local Setup & Testing ##
+Run all the commands from the root directory of the repository.
 
-### Starting Docker ###
+## Building and Saving the Image ##
 
-Alternatively use ``enable`` for automatic start on startup.
-
-```console
-systemctl start docker
+```terminal
+docker/build.sh
 ```
 
-### Building the Image ###
+This creates the file `docker/ext_val.tar` (the docker image) and
+`docker/ext_val.zip` (the image together with the scripts).
 
-```console
-docker image build -t ext_val .
+## Transferring the Image Different System ##
+
+First copy the image and the scripts to where ever you want to run
+it.  For example to a compute server.
+
+```terminal
+scp docker/ext_val.zip <server>:~/
 ```
 
-### Running It ###
+Then, on the target computer, unpack and load the image so that docker
+knows it.
 
-```console
-docker run --name ext_val --rm -v $PWD/data/input_data:/ext_val/input_data -v $PWD/data/output_data:/ext_val/output_data --user "$(id -u):$(id -g)" ext_val
+```terminal
+unzip ext_val.zip
+cd ext_val/
+./load.sh
 ```
 
-### Entering the Container ###
+## Preparing the Data ##
 
-```console
-docker exec -it ext_val bash
+The following removes the existing data folder, creates a new one and
+downloads the network data from zenodo.  It also creates all the
+necessary folders.
+
+```terminal
+./setup_data.sh
 ```
 
-### Stopping the Container ###
+## Running the Experiments ##
 
-```console
-docker kill ext_val
+First you have to start the container.
+
+```terminal
+./run.sh
 ```
 
-### Removing Old Images ###
+After the container has started, you can enter bash in the container.
+If you want to use `screen` to be able to exit and later reenter the
+container, this is the place to do it.
+
+```terminal
+./enter.sh
+```
+
+In the container, you can run the experiments.
+
+```terminal
+./run_and_build_plots.sh
+exit
+```
+
+Don't forget to kill the container afterwards.
+
+```terminal
+./kill.sh
+```
+
+## Output Data ##
+
+The output data is then located (in the host) under `ext_val/data/`.
+
+# Notes #
+
+## Removing Old Images ##
 
 ```console
 docker images | grep none | awk '{ print $3; }' | xargs docker rmi --force
-```
-
-## Distributing the Image ##
-
-### Export the Image ###
-
-```console
-docker save -o ext_val.tar ext_val
-```
-
-### Loading the Image File ###
-
-```console
-docker load -i ext_val.tar
 ```

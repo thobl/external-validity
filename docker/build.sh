@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 
-# todo: clone in the dockerfile itself, once the repo is public
-REPO="git@git.scc.kit.edu:scale/research/locality-and-heterogeneity.git"
-LOCALREPO="docker/locality-and-heterogeneity/"
-if [ ! -d $LOCALREPO ] 
-then
-    git clone $REPO $LOCALREPO
-else
-    cd $LOCALREPO
-    git pull
-    cd -
-fi
-
 docker image build -t ext_val docker
+docker save -o docker/ext_val.tar ext_val
+
+cd docker/
+mkdir -p ext_val/data/input_data/raw/
+mkdir ext_val/data/output_data/
+mkdir ext_val/data/plots/
+
+cp ext_val.tar ext_val/
+cp enter.sh ext_val/
+cp kill.sh ext_val/
+cp load.sh ext_val/
+cp run.sh ext_val/
+cp setup_data.sh ext_val/
+
+rm ext_val.zip
+zip -r ext_val.zip ext_val/
+rm -rf ext_val/

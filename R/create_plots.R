@@ -1,4 +1,5 @@
 options(warn = -1)
+options(dplyr.summarise.inform = FALSE)
 pdf(NULL)
 source("R/helper/load_helpers.R")
 

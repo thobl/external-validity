@@ -101,17 +101,26 @@ plots <- main_plot(
 )
 ggplotly(plots$p1, tooltip = "text")
 
+max_var <- tbl_non_aggr %>% 
+    filter_generated(rm_torus = TRUE) %>%
+    filter(type_detailed == "girg", algo == "ifub_foursweephd") %>%
+    group_by(gen_T, gen_ple) %>%
+    summarise(avg = mean(val), var = sum((val - avg)^2)) %>%
+    ungroup() %>%
+    filter(var == max(var))
+
 values <- tbl_non_aggr %>%
     filter_generated(rm_torus = TRUE) %>%
     filter(
         type_detailed == "girg",
         algo == "ifub_foursweephd",
-        gen_ple == 8.6, gen_T == 0.4
+        gen_ple == max_var$gen_ple, gen_T == max_var$gen_T
     ) %>%
     pull(val)
 
 msg(sprintf(
-    "exponents (ifub_foursweephd) for GIRG with ple = 8.6 and T = 0.4 (5 graphs): %s; average: %.2f",
+    "exponents (ifub_foursweephd) for GIRG with ple = %s and T = %s (5 graphs): %s; average: %.2f",
+    max_var$gen_ple, max_var$gen_T,
     paste(sort(round(values, 2)), collapse = ", "),
     mean(values)
 ))

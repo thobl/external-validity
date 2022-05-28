@@ -148,12 +148,29 @@ create_pdf("R/output/coloring_distribution.pdf", p,
 
 ######################################################################
 ## additional data points for the variance on GIRGs
+plots <- main_plot(
+    tbl_non_aggr %>% filter_generated(
+        rm_square = TRUE, rm_deg_10 = TRUE, rm_deg_scaling = TRUE
+    ),
+    val_title = val, val_colors = colors, point_size_scale = 3
+)
+ggplotly(plots$p1, tooltip = "text")
+
+max_var <- tbl_non_aggr %>% 
+    filter_generated(rm_square = TRUE, rm_deg_10 = TRUE) %>%
+    filter(type_detailed == "girg") %>%
+    group_by(gen_T, gen_ple) %>%
+    summarize(avg = mean(val), var = sum((val - avg)^2)) %>%
+    ungroup() %>%
+    filter(var == max(var))
+
 values <- tbl_non_aggr %>%
     filter_generated(rm_square = TRUE, rm_deg_10 = TRUE) %>%
-    filter(type_detailed == "girg", gen_T == 0.7, gen_ple == 4.9) %>%
+    filter(type_detailed == "girg", gen_T == max_var$gen_T, gen_ple == max_var$gen_ple) %>%
     pull(val)
 msg(sprintf(
-    "exponents (core size) for GIRG with average degree 20, ple = 4.9 and T = 0.7 (5 graphs): %s; average: %.2f",
+    "exponents (core size) for GIRG with average degree 20, ple = %s and T = %s (5 graphs): %s; average: %.2f",
+    max_var$gen_ple, max_var$gen_T,
     paste(sort(round(values, 2)), collapse = ", "),
     mean(values)
 ))

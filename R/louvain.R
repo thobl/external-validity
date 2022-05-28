@@ -47,7 +47,7 @@ create_pdf("R/output/louvain_torus_square.pdf", p, width = 0.66)
 
 ######################################################################
 ## plotly plots
-plots <- main_plot(tbl_non_aggr %>% filter_generated(rm_square = TRUE),
+plots <- main_plot(tbl_non_aggr %>% filter_generated(rm_square = TRUE) %>% filter(val <= 1000),
     val_title = val, val_colors = colors,
     val_color_trans = "log10", point_size_scale = 3
 )
@@ -61,9 +61,18 @@ ggplotly(plots$p3, tooltip = "text")
 er <- tbl_non_aggr %>%
     filter(type_detailed == "er") %>%
     pull(val)
-cl_ple86 <- tbl_non_aggr %>%
-    filter(type_detailed == "cl", gen_ple == 8.6) %>%
+
+cl_ple <- tbl_non_aggr %>%
+    filter(type_detailed == "cl") %>%
+    group_by(gen_ple) %>%
+    summarize(var = max(val) / min(val)) %>%
+    ungroup() %>%
+    filter(var == max(var)) %>%
+    pull(gen_ple)
+cl <- tbl_non_aggr %>%
+    filter(type_detailed == "cl", gen_ple == cl_ple) %>%
     pull(val)
+
 tbl_girg <- tbl %>%
     filter_generated(rm_square = TRUE) %>%
     filter(type_detailed == "girg")
@@ -78,9 +87,10 @@ msg(sprintf(
     tbl %>% filter(type_detailed == "cl") %>% pull(val) %>% max()
 ))
 msg(sprintf(
-    "iterations for CL with ple 8.6 (5 graphs): %s; average: %.2f",
-    cl_ple86 %>% sort() %>% paste(collapse = ", "),
-    mean(cl_ple86)
+    "iterations for CL with ple %s (5 graphs): %s; average: %.2f",
+    cl_ple,
+    cl %>% sort() %>% paste(collapse = ", "),
+    mean(cl)
 ))
 msg(sprintf(
     "girg (aggregated) ranges from %.1f to %.1f",

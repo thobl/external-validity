@@ -11,10 +11,76 @@ only want to run a subset of experiments, apply some modifications, or
 add your own experiments, read the subsequent details on our
 experiment setup.
 
+Additional data can be found on
+[zenodo.org/record/6587324](https://zenodo.org/record/6587324).
 
 ## Running it in the Docker Container ##
 
-todo: add info and links
+For running the docker container, you of course need docker.
+
+### In a Nutshell ###
+
+On the host computer (the one you are running the experiments on), do
+the following to get the container running.
+
+```terminal
+wget https://zenodo.org/record/6587324/files/ext-val.zip
+unzip ext_val.zip
+cd ext_val
+./load.sh
+./setup_data.sh
+./run.sh
+./enter.sh
+```
+
+The last command enters a bash in the docker container.  You might want
+to run it as `screen ./enter.sh` if you are running on some server and
+want to be able to log out and back in again while running the
+experiments.
+
+In the container, start the experiments as follows.  This uses all but
+two cores of the machine and may take a while (but you'll see progress
+bars).
+
+```termian
+./run_and_build_plots.sh
+```
+
+Afterwards, exit and kill the container.
+
+```termian
+exit
+./kill.sh
+```
+
+The computed data should now be in `data/`.
+
+### Some More Details ###
+
+The file `ext_val.zip` contains the docker container `ext_val.tar` as
+well as the scripts used above.  Essentially the above process does
+the following.
+
+  * `load.sh` tells docker that the image ext_val exists
+  * `setup_data.sh` downloads the network data for running the
+    experiments.  Alternatively, you can manually download the
+    networks from
+    [zenodo.org/record/6587324/files/input_data.zip](https://zenodo.org/record/6587324/files/input_data.zip)
+    and unzip them.  Check that the networks are located under
+    `data/input_data/raw/`.
+  * `run.sh` starts the docker container.  It mounts the host
+    directories `data/input_data`, `data/output_data`, and
+    `data/plots` to the container folders `/ext_val/input_data`,
+    `/ext_val/output_data`, and `/ext_val/R/output`, respectively.
+    You can use different host folders but should mount something to
+    each of these three container folders.  Moreover, the folder
+    mounted to `/ext_val/input_data` should contain the networks as
+    described above.
+  * `enter.sh` executes `bash` in the docker container
+  * `./run_and_build_plots.sh` in the container runs the experiments.
+    Also see details on the experiment setup below.
+  * `kill.sh` kills the container (otherwise it keeps running)
+
 
 ## Running it Natively ##
 
@@ -40,8 +106,9 @@ To install the required R-packages, run the following command.
 R -e 'install.packages(c("ggplot2", "egg", "xtable", "extrafont", "plyr", "dplyr", "reshape2", "grid", "ggpubr", "GGally", "showtext", "plotly", "igraph"), repos="https://cloud.r-project.org/")'
 ```
 
-Additionally, the file `lmroman10-regular.otf` must be available (and
-finale) in your system.  You can, e.g., just download it as follows.
+Additionally, to create the pdf plots, the file
+`lmroman10-regular.otf` must be available in your system.  You can,
+e.g., just download it as follows.
 
 ```terminal
 wget http://www.gust.org.pl/projects/e-foundry/latin-modern/download/lm2.004otf.zip &&\
@@ -71,7 +138,7 @@ The input data is not contained in this repository.  To get the data
 (744 MB) and put it in the right place do the following.
 
 ```terminal
-wget https://zenodo.org/record/6586237/files/input_data.zip
+wget https://zenodo.org/record/6587324/files/input_data.zip
 unzip input_data.zip
 rm input_data.zip
 ```
