@@ -1,19 +1,20 @@
-FROM archlinux:latest
+FROM alpine:latest
 
-COPY mirrorlist /etc/pacman.d/mirrorlist
-RUN pacman -Syy
-RUN pacman --noconfirm -S git gcc cmake make r gcc-fortran pkg-config otf-latin-modern python python-pip
+# bash for scripts + to interact with the container
+RUN apk add --no-cache bash
 
-# R dependencies
-RUN R -e 'install.packages(c("ggplot2", "egg", "xtable", "extrafont", "plyr", "dplyr", "reshape2", "grid", "ggpubr", "GGally", "showtext", "plotly", "igraph"), repos="https://cloud.r-project.org/")'
+# c++ dependencies
+RUN apk add --no-cache git g++ cmake make libgomp
 
 # code
+RUN apk add --no-cache git
 RUN git clone https://github.com/thobl/external-validity.git ext_val
 WORKDIR /ext_val
 RUN git submodule init
 RUN git submodule update
 
-# run + dependencies
+# python dependencies
+RUN apk add --no-cache python3 py3-pip
 WORKDIR /ext_val/run
 RUN pip3 install .
 WORKDIR /ext_val
@@ -21,7 +22,17 @@ WORKDIR /ext_val
 # building c++
 RUN ./build.sh
 
-RUN pacman -Scc
+# LaTeX font for the plots
+RUN wget http://www.gust.org.pl/projects/e-foundry/latin-modern/download/lm2.004otf.zip &&\
+    unzip -p lm2.004otf.zip lmroman10-regular.otf > lmroman10-regular.otf &&\
+    rm lm2.004otf.zip
 
+# R dependencies
+RUN apk add --no-cache R R-dev linux-headers freetype-dev
+RUN R -e 'install.packages(c("ggplot2", "grid", "ggpubr", "egg", "showtext", "xtable", "GGally", "dplyr", "plotly"), repos="https://cloud.r-project.org/")'
+
+# check whether R dependencies have been installed correctly
+RUN Rscript R/helper/load_dependencies.R
+
+# keeping the container running
 ENTRYPOINT tail -f /dev/null
-
