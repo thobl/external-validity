@@ -3,7 +3,9 @@
 This repository contains the code to reproduce our experiments from
 the paper
 
-> Thomas Bläsius, Philipp Fischbeck: *On the External Validity of Average-Case Analyses of Graph Algorithms.*
+> Thomas Bläsius, Philipp Fischbeck: *On the External Validity of
+> Average-Case Analyses of Graph Algorithms.*
+> [arxiv.org/abs/2205.15066](https://arxiv.org/abs/2205.15066)
 
 To reproduce our experiments, you can either use the docker container
 or run it natively.  We first describe these two approaches.  If you
