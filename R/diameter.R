@@ -4,7 +4,7 @@ source("R/helper/load_helpers.R")
 ## read the data
 tbl_non_aggr <- read_basic() %>%
     also(read_diameter_exact()) %>%
-    filter_generated(rm_deg_20 = TRUE, rm_deg_scaling = TRUE) %>%
+    graph_filter(rm_deg_20 = TRUE, rm_deg_scaling = TRUE) %>%
     mutate(val = log(bfs_count, base = n))
 tbl <- tbl_non_aggr %>% aggregate_generated()
 
@@ -37,15 +37,24 @@ val_limits <- c(tbl %>% pull(val) %>% min(), tbl %>% pull(val) %>% max())
 
 ## ifub_foursweephd
 plots <- main_plot(tbl %>%
-    filter_generated(rm_torus = TRUE) %>%
+    graph_filter(rm_torus = TRUE, rm_het_extreme = TRUE) %>%
     filter(algo == "ifub_foursweephd"),
 val_title = val, val_colors = colors, val_limits = val_limits
 )
 create_pdf("R/output/diameter_ifub_foursweephd.pdf", plots$p)
 
+## ifub_foursweephd with extreme heterogeneity
+p_extreme <- mid_plot_with_extreme(tbl %>%
+    graph_filter(rm_torus = TRUE) %>%
+    filter(algo == "ifub_foursweephd"),
+val_title = val, val_colors = colors, val_limits = val_limits
+)
+create_pdf("R/output/diameter_ifub_foursweephd_full.pdf", p_extreme, width = 0.45)
+
+
 ## ifub_foursweephd without legend
 plots <- main_plot(tbl %>%
-    filter_generated(rm_torus = TRUE) %>%
+    graph_filter(rm_torus = TRUE, rm_het_extreme = TRUE) %>%
     filter(algo == "ifub_foursweephd"),
 val_title = val, val_colors = colors, val_limits = val_limits, no_legend = TRUE
 )
@@ -55,11 +64,19 @@ create_pdf("R/output/diameter_ifub_foursweephd_noleg.pdf", plots$p,
 
 ## ifub_hd
 plots <- main_plot(tbl %>%
-    filter_generated(rm_torus = TRUE) %>%
+    graph_filter(rm_torus = TRUE, rm_het_extreme = TRUE) %>%
     filter(algo == "ifub_hd"),
 val_title = val, val_colors = colors, val_limits = val_limits
 )
 create_pdf("R/output/diameter_ifub_hd.pdf", plots$p)
+
+## ifub_hd with extreme heterogeneity
+p_extreme_hd <- mid_plot_with_extreme(tbl %>%
+    graph_filter(rm_torus = TRUE) %>%
+    filter(algo == "ifub_hd"),
+val_title = val, val_colors = colors, val_limits = val_limits
+)
+create_pdf("R/output/diameter_ifub_hd_full.pdf", p_extreme_hd, width = 0.45)
 
 
 ######################################################################
@@ -95,14 +112,14 @@ create_pdf("R/output/diameter_ifub_hd_torus_square.pdf", p,
 ## additional output concerning the variance
 plots <- main_plot(
     tbl_non_aggr %>%
-        filter_generated(rm_torus = TRUE) %>%
+        graph_filter(rm_torus = TRUE, rm_het_extreme = TRUE) %>%
         filter(algo == "ifub_foursweephd"),
     val_title = val, val_colors = colors, val_limits = val_limits, point_size_scale = 3
 )
 ggplotly(plots$p1, tooltip = "text")
 
-max_var <- tbl_non_aggr %>% 
-    filter_generated(rm_torus = TRUE) %>%
+max_var <- tbl_non_aggr %>%
+    graph_filter(rm_torus = TRUE) %>%
     filter(type_detailed == "girg", algo == "ifub_foursweephd") %>%
     group_by(gen_T, gen_ple) %>%
     summarise(avg = mean(val), var = sum((val - avg)^2)) %>%
@@ -110,7 +127,7 @@ max_var <- tbl_non_aggr %>%
     filter(var == max(var))
 
 values <- tbl_non_aggr %>%
-    filter_generated(rm_torus = TRUE) %>%
+    graph_filter(rm_torus = TRUE) %>%
     filter(
         type_detailed == "girg",
         algo == "ifub_foursweephd",
@@ -136,13 +153,17 @@ stats <- tbl %>%
     ungroup() %>%
     also(read_diameter_bounds()) %>%
     filter(algo == "four_sweep") %>%
-    summarize(exact = sum(diameter == lower_bound),
-              diff_max_1 = sum(diameter <= lower_bound + 1),
-              diff_max_2 = sum(diameter <= lower_bound + 2))
+    summarize(
+        exact = sum(diameter == lower_bound),
+        diff_max_1 = sum(diameter <= lower_bound + 1),
+        diff_max_2 = sum(diameter <= lower_bound + 2)
+    )
 
 
-msg(sprintf("total real: %d", 
-            tbl %>% filter(type == "real") %>% pull(graph) %>% unique() %>% length()))
+msg(sprintf(
+    "total real: %d",
+    tbl %>% filter(type == "real") %>% pull(graph) %>% unique() %>% length()
+))
 msg(sprintf("four_sweep lb == diameter: %d", stats$exact))
 msg(sprintf("four_sweep lb + 1 >= diameter: %d", stats$diff_max_1))
 msg(sprintf("four_sweep lb + 2 >= diameter: %d", stats$diff_max_2))

@@ -11,7 +11,7 @@ read <- function(name) {
 
 read_basic <- function() {
     #' read basic information we always need
-    read_edge_locality() %>%
+    basic_tbl <- read_edge_locality() %>%
         also(read_deg_distr()) %>%
         also(read_gen_args()) %>%
         add_graph_types() %>%
@@ -21,6 +21,7 @@ read_basic <- function() {
         add_is_actually_gen() %>%
         filter(!is_dense & !is_tree & !is_gen) %>%
         select(-is_dense, -is_tree, -is_gen)
+    basic_tbl
 }
 
 def_simple_read <- function(name) {
@@ -96,7 +97,7 @@ read_deg_distr <- function() {
             m = sum(frequency * degree / 2),
             avg_deg = m * 2 / n,
             max_deg = max(degree),
-            deg_var = sum((degree - avg_deg)^2 / n),
+            deg_var = sum(frequency * (degree - avg_deg)^2 / n),
             deg_coeff_of_variation = sqrt(deg_var) / avg_deg,
             deg_1_count = sum(ifelse(degree == 1, frequency, 0)),
             deg_2_count = sum(ifelse(degree == 2, frequency, 0)),
@@ -179,30 +180,38 @@ add_is_actually_gen <- function(tbl) {
         "^cl", "^sw-", "^ba-", "^rgg_n",
         ## probably random
         "^er-avg", "^g[0-9]+$",
+        ## symmetric powers of "08blocks" graph
+        ## (https://hpac.imag.fr/Matrices/SPG/)
+        ## (https://hpac.imag.fr/Matrices/SPG/sympower.html)
+        "^EX[1-6]$",
         sep = "|"
     )
     tbl %>% mutate(is_gen = (type == "real") &
         grepl(pattern, graph, ignore.case = TRUE))
 }
 
+het_extreme_min <- -1.0
+het_extreme_max <- 1.5
 
-filter_generated <- function(tbl, rm_torus = FALSE, rm_square = FALSE,
-                             rm_deg_10 = FALSE, rm_deg_20 = FALSE,
-                             rm_deg_scaling = FALSE) {
+graph_filter <- function(tbl, rm_torus = FALSE, rm_square = FALSE,
+                         rm_deg_10 = FALSE, rm_deg_20 = FALSE,
+                         rm_deg_scaling = FALSE, rm_het_extreme = FALSE) {
     tbl %>%
         mutate(
             tmp_torus = !is.na(gen_square) & !gen_square,
             tmp_square = !is.na(gen_square) & gen_square,
             tmp_deg_10 = (type == "generated") & (gen_deg == 10),
             tmp_deg_20 = (type == "generated") & (gen_deg == 20),
-            tmp_scaling = (type == "girg_deg_scaling")
+            tmp_scaling = (type == "girg_deg_scaling"),
+            tmp_het_extreme = (het < het_extreme_min | het > het_extreme_max)
         ) %>%
         filter(
             !(rm_torus & tmp_torus) &
                 !(rm_square & tmp_square) &
                 !(rm_deg_10 & tmp_deg_10) &
                 !(rm_deg_20 & tmp_deg_20) &
-                !(rm_deg_scaling & tmp_scaling)
+                !(rm_deg_scaling & tmp_scaling) &
+                !(rm_het_extreme & tmp_het_extreme)
         ) %>%
         select(-starts_with("tmp_"))
 }

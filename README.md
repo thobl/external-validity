@@ -261,3 +261,19 @@ experiments).
   * `girgs/` submodule for generating GIRGs
   * `run/` submodule for python module running the experiments
   * `quick-cliques/` submodule for enumerating maximal cliques
+
+## Changelog ##
+
+### 23.10.2022 Bugfix ###
+
+There was an error in the calculation of the variance of the degree
+distribution.  Fixing this error made the following additional changes
+necessary.
+
+  * We adjusted the power-law exponents used for the generated
+    networks to again yield graphs with evenly spaced heterogeneity
+    values.
+  * There are few real-world networks with very high or very low
+    heterogeneity values.  To improve readability, we removed those
+    networks from the main plots and created additional plots that
+    include them.

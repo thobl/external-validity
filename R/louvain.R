@@ -11,7 +11,7 @@ colors <- c(green, yellow, red, violet)
 tbl_non_aggr <- read_basic() %>%
     also(read_louvain()) %>%
     mutate(val = iterations_louvain) %>%
-    filter_generated(rm_deg_20 = TRUE, rm_deg_scaling = TRUE)
+    graph_filter(rm_deg_20 = TRUE, rm_deg_scaling = TRUE)
 tbl <- tbl_non_aggr %>% aggregate_generated()
 
 
@@ -29,11 +29,20 @@ tbl <- tbl %>% filter(val <= 1000)
 
 ######################################################################
 ## main pdf plots
-plots <- main_plot(tbl %>% filter_generated(rm_square = TRUE),
+plots <- main_plot(tbl %>% graph_filter(rm_square = TRUE, rm_het_extreme = TRUE),
     val_title = val, val_colors = colors,
     val_color_trans = "log10"
 )
 create_pdf("R/output/louvain.pdf", plots$p)
+
+
+######################################################################
+## main pdf plot with extreme heterogeneity
+p_extreme <- mid_plot_with_extreme(tbl %>% graph_filter(rm_square = TRUE),
+    val_title = val, val_colors = colors,
+    val_color_trans = "log10"
+)
+create_pdf("R/output/louvain_full.pdf", p_extreme, width = 0.45)
 
 
 ######################################################################
@@ -47,7 +56,7 @@ create_pdf("R/output/louvain_torus_square.pdf", p, width = 0.66)
 
 ######################################################################
 ## plotly plots
-plots <- main_plot(tbl_non_aggr %>% filter_generated(rm_square = TRUE) %>% filter(val <= 1000),
+plots <- main_plot(tbl_non_aggr %>% graph_filter(rm_square = TRUE) %>% filter(val <= 1000),
     val_title = val, val_colors = colors,
     val_color_trans = "log10", point_size_scale = 3
 )
@@ -74,7 +83,7 @@ cl <- tbl_non_aggr %>%
     pull(val)
 
 tbl_girg <- tbl %>%
-    filter_generated(rm_square = TRUE) %>%
+    graph_filter(rm_square = TRUE) %>%
     filter(type_detailed == "girg")
 
 msg(sprintf(

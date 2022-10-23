@@ -12,6 +12,8 @@ tbl <- read_basic() %>%
 p <- ggarrange(
     ggplot(tbl, aes(x = het)) +
         geom_density() +
+        geom_vline(xintercept = het_extreme_min, size = 0.15) +
+        geom_vline(xintercept = het_extreme_max, size = 0.15) +
         xlab("heterogeneity"),
     ggplot(tbl, aes(x = avg_deg_locality)) +
         geom_density() +

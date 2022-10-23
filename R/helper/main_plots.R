@@ -36,7 +36,7 @@ main_plot <- function(tbl,
     plot_non_aggregated <- function(tbl, alpha = 0.5) {
         ## the plot
         ggplot(tbl, aes(x = het, y = loc, color = val, text = text)) +
-            geom_point(alpha = alpha, size = point_size_scale * 0.7) +
+            geom_point(alpha = alpha, size = point_size_scale * 0.8, shape = 16) +
             facet_grid(
                 cols = vars(type),
                 labeller = labeller(
@@ -58,7 +58,7 @@ main_plot <- function(tbl,
     if (tbl %>% filter(type == "real") %>% nrow() == 0) {
         return(p1)
     }
-    
+
     ## plot for real-world networks (non-aggregated)
     p2 <- plot_non_aggregated(tbl %>% filter(type == "real"))
 
@@ -149,7 +149,7 @@ girg_plot <- function(tbl,
 
     ## actual plot
     ggplot(tbl, aes(x = het, y = loc, color = val)) +
-        geom_point(alpha = 1, size = point_size_scale * 0.7) +
+        geom_point(alpha = 1, size = point_size_scale * 0.8) +
         facet_grid(
             cols = vars(type),
             labeller = labeller(
@@ -170,4 +170,56 @@ girg_plot <- function(tbl,
         xlab("heterogeneity") +
         ylab("locality") +
         leg_theme
+}
+
+
+mid_plot_with_extreme <- function(tbl,
+                                  val_title = "value",
+                                  val_colors = c(green, yellow, red),
+                                  val_color_trans = "identity",
+                                  point_size_scale = 1,
+                                  val_limits = NULL) {
+    ## textual description for plotly (html)
+    tbl <- tbl %>% mutate(text = sprintf(
+        "graph: %s\nhet: %.3f\nloc: %.3f\nval: %.3f",
+        graph, het, loc, val
+    ))
+
+    ## use color limits if given
+    if (is.null(val_limits)) {
+        val_limits <- c(min(tbl$val), max(tbl$val))
+    }
+
+    p <- ggplot(
+        tbl %>% filter(type == "real"),
+        aes(
+            x = het, y = loc, color = val, text = text,
+            shape = (het < het_extreme_min | het > het_extreme_max)
+        )
+    ) +
+        geom_vline(xintercept = het_extreme_min, size = 0.15) +
+        geom_vline(xintercept = het_extreme_max, size = 0.15) +
+        geom_point(alpha = 0.5, size = point_size_scale * 0.8) +
+        xlim(c(min(tbl$het), max(tbl$het))) +
+        ylim(c(min(tbl$loc), max(tbl$loc))) +
+        xlab("heterogeneity") +
+        ylab("locality") +
+        scale_colour_gradientn(
+            name = val_title,
+            limits = val_limits,
+            colors = val_colors,
+            trans = val_color_trans
+        ) +
+        scale_shape(guide = "none") +
+        theme(
+            legend.key.height = unit(0.35, "cm"),
+            legend.margin = margin(t = 0, r = 0, b = -0.2, l = 0, unit = "cm"),
+            legend.position = "top"
+        ) +
+        guides(color = guide_colourbar(
+            title.position = "top",
+            title.hjust = 0.5
+        ))
+
+    p
 }

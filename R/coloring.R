@@ -30,8 +30,11 @@ tbl <- tbl %>% filter(!is.na(val))
 
 ## average degree 10
 plots <- main_plot(
-    tbl %>% filter_generated(
-        rm_square = TRUE, rm_deg_20 = TRUE, rm_deg_scaling = TRUE
+    tbl %>% graph_filter(
+        rm_square = TRUE,
+        rm_deg_20 = TRUE,
+        rm_deg_scaling = TRUE,
+        rm_het_extreme = TRUE
     ),
     val_title = val, val_colors = colors
 )
@@ -39,8 +42,11 @@ create_pdf("R/output/coloring.pdf", plots$p)
 
 ## average degree 20
 plots <- main_plot(
-    tbl %>% filter_generated(
-        rm_square = TRUE, rm_deg_10 = TRUE, rm_deg_scaling = TRUE
+    tbl %>% graph_filter(
+        rm_square = TRUE,
+        rm_deg_10 = TRUE,
+        rm_deg_scaling = TRUE,
+        rm_het_extreme = TRUE
     ),
     val_title = val, val_colors = colors
 )
@@ -51,8 +57,27 @@ create_pdf("R/output/coloring_high_avg_deg_gen.pdf",
 )
 
 ######################################################################
+## extreme heterogeneity pdf plots
+
+p_extreme <- mid_plot_with_extreme(tbl %>% graph_filter(
+    rm_square = TRUE,
+    rm_deg_20 = TRUE,
+    rm_deg_scaling = TRUE
+), val_title = val, val_colors = colors)
+create_pdf("R/output/coloring_full.pdf", p_extreme, width = 0.45)
+
+
+p_extreme_high <- mid_plot_with_extreme(tbl %>% graph_filter(
+    rm_square = TRUE,
+    rm_deg_10 = TRUE,
+    rm_deg_scaling = TRUE
+), val_title = val, val_colors = colors)
+create_pdf("R/output/coloring_high_avg_deg_full.pdf", p_extreme_high, width = 0.45)
+
+
+######################################################################
 ## comparison between square and torus
-p <- girg_plot(tbl %>% filter_generated(rm_deg_20 = TRUE),
+p <- girg_plot(tbl %>% graph_filter(rm_deg_20 = TRUE),
     val_title = val, val_colors = colors
 )
 create_pdf("R/output/coloring_torus_square.pdf", p, width = 0.66)
@@ -61,8 +86,8 @@ create_pdf("R/output/coloring_torus_square.pdf", p, width = 0.66)
 ######################################################################
 ## plotly plots
 plots <- main_plot(
-    tbl %>% filter_generated(
-        rm_square = TRUE, rm_deg_20 = TRUE, rm_deg_scaling = TRUE
+    tbl %>% graph_filter(
+        rm_square = TRUE, rm_deg_20 = TRUE, rm_deg_scaling = TRUE, rm_het_extreme = TRUE
     ),
     val_title = val, val_colors = colors, point_size_scale = 3
 )
@@ -93,7 +118,7 @@ create_pdf("R/output/coloring_girg_scaled.pdf", scaling_plot,
 
 ## prepare some data
 tbl_clean <- tbl %>%
-    filter_generated(
+    graph_filter(
         rm_square = TRUE,
         rm_deg_20 = TRUE, rm_deg_scaling = TRUE
     ) %>%
@@ -110,13 +135,20 @@ val_limits <- c(
 
 ## clique
 plots <- main_plot(
-    tbl_clean %>% mutate(val = val_clique),
+    tbl_clean %>% mutate(val = val_clique) %>% graph_filter(rm_het_extreme = TRUE),
     val_title = val, val_colors = colors, val_limits = val_limits
 )
 create_pdf("R/output/cliques_max_clique.pdf", plots$p)
 
+## clique with extreme heterogeneity
+
+p_max_clique_extreme <- mid_plot_with_extreme(tbl_clean %>% mutate(val = val_clique),
+    val_title = val, val_colors = colors, val_limits = val_limits
+)
+create_pdf("R/output/cliques_max_clique_full.pdf", p_max_clique_extreme, width = 0.45)
+
 plots <- main_plot(
-    tbl_clean %>% mutate(val = val_clique),
+    tbl_clean %>% mutate(val = val_clique) %>% graph_filter(rm_het_extreme = TRUE),
     val_title = val, val_colors = colors, val_limits = val_limits,
     no_legend = TRUE
 )
@@ -124,13 +156,18 @@ create_pdf("R/output/cliques_max_clique_noleg.pdf", plots$p, height = 0.364)
 
 ## degeneracy
 plots <- main_plot(
-    tbl_clean %>% mutate(val = val_degen),
+    tbl_clean %>% mutate(val = val_degen) %>% graph_filter(rm_het_extreme = TRUE),
     val_title = val, val_colors = colors, val_limits = val_limits
 )
 create_pdf("R/output/degeneracy.pdf", plots$p)
 
+p_degeneracy_extreme <- mid_plot_with_extreme(tbl_clean %>% mutate(val = val_degen),
+    val_title = val, val_colors = colors, val_limits = val_limits
+)
+create_pdf("R/output/degeneracy_full.pdf", p_degeneracy_extreme, width = 0.45)
+
 plots <- main_plot(
-    tbl_clean %>% mutate(val = val_degen),
+    tbl_clean %>% mutate(val = val_degen) %>% graph_filter(rm_het_extreme = TRUE),
     val_title = val, val_colors = colors, val_limits = val_limits,
     no_legend = TRUE
 )
@@ -149,15 +186,15 @@ create_pdf("R/output/coloring_distribution.pdf", p,
 ######################################################################
 ## additional data points for the variance on GIRGs
 plots <- main_plot(
-    tbl_non_aggr %>% filter_generated(
+    tbl_non_aggr %>% graph_filter(
         rm_square = TRUE, rm_deg_10 = TRUE, rm_deg_scaling = TRUE
     ),
     val_title = val, val_colors = colors, point_size_scale = 3
 )
 ggplotly(plots$p1, tooltip = "text")
 
-max_var <- tbl_non_aggr %>% 
-    filter_generated(rm_square = TRUE, rm_deg_10 = TRUE) %>%
+max_var <- tbl_non_aggr %>%
+    graph_filter(rm_square = TRUE, rm_deg_10 = TRUE) %>%
     filter(type_detailed == "girg") %>%
     group_by(gen_T, gen_ple) %>%
     summarize(avg = mean(val), var = sum((val - avg)^2)) %>%
@@ -165,7 +202,7 @@ max_var <- tbl_non_aggr %>%
     filter(var == max(var))
 
 values <- tbl_non_aggr %>%
-    filter_generated(rm_square = TRUE, rm_deg_10 = TRUE) %>%
+    graph_filter(rm_square = TRUE, rm_deg_10 = TRUE) %>%
     filter(type_detailed == "girg", gen_T == max_var$gen_T, gen_ple == max_var$gen_ple) %>%
     pull(val)
 msg(sprintf(

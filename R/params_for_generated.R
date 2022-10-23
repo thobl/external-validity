@@ -4,9 +4,9 @@ source("R/helper/load_helpers.R")
 ## read the data
 tbl_base <- read_basic() %>%
     filter(type == "generated") %>%
-    filter_generated(rm_deg_20 = TRUE)
+    graph_filter(rm_deg_20 = TRUE)
 tbl <- tbl_base %>%
-    filter_generated(rm_square = TRUE) %>%
+    graph_filter(rm_square = TRUE) %>%
     aggregate_generated() %>%
     arrange(gen_ple, gen_T)
 
@@ -42,7 +42,7 @@ p <- ggplot(tbl, aes(x = het, y = loc, color = type_detailed)) +
         nudge_y = -0.02, show.legend = FALSE
     ) +
     geom_point() +
-    xlim(-2.25, 1.27) +
+    xlim(-1.00, 1.27) +
     ylim(-0.08, 0.98) +
     xlab("heterogeneity") +
     ylab("locality") +
@@ -59,7 +59,7 @@ create_pdf("R/output/params_of_generated_networks.pdf", p, height = 0.79)
 ## helper stuff for estimating the parameters to get uniform
 ## heterogeneity / locality
 
-tbl_T <- tbl %>% filter(type_detailed == "girg", gen_T == 0.62)
+tbl_T <- tbl %>% filter(type_detailed == "girg", gen_T == 0.7)
 f <- approxfun(tbl_T$het, tbl_T$gen_ple)
 f(0)
 p <- ggplot(
@@ -104,10 +104,10 @@ f(values)
 ######################################################################
 ## some additional stats
 tbl_girg <- tbl_base %>%
-    filter_generated(rm_square = TRUE) %>%
+    graph_filter(rm_square = TRUE) %>%
     filter(type_detailed == "girg")
 tbl_girg_square <- tbl_base %>%
-    filter_generated(rm_torus = TRUE) %>%
+    graph_filter(rm_torus = TRUE) %>%
     filter(type_detailed == "girg")
 tbl_cl <- tbl_base %>% filter(type_detailed == "cl")
 tbl_er <- tbl_base %>% filter(type_detailed == "er")

@@ -13,7 +13,7 @@ tbl <- read_basic() %>%
     also(read_degeneracy()) %>%
     mutate(val = nr_cliques / m) %>%
     aggregate_generated() %>%
-    filter_generated(rm_deg_20 = TRUE, rm_deg_scaling = TRUE)
+    graph_filter(rm_deg_20 = TRUE, rm_deg_scaling = TRUE)
 
 ######################################################################
 ## output some stats
@@ -57,10 +57,17 @@ tbl_high <- tbl %>% filter(!is.na(val) & val > 1)
 ######################################################################
 ## main pdf plots
 
-plots <- main_plot(tbl_low %>% filter_generated(rm_square = TRUE),
+plots <- main_plot(tbl_low %>% graph_filter(rm_square = TRUE, rm_het_extreme = TRUE),
     val_title = val
 )
 create_pdf("R/output/cliques.pdf", plots$p)
+
+
+######################################################################
+## extreme heterogeneity pdf plots
+
+p_extreme <- mid_plot_with_extreme(tbl_low, val_title = val)
+create_pdf("R/output/cliques_full.pdf", p_extreme, width = 0.45)
 
 
 ######################################################################
@@ -71,7 +78,7 @@ create_pdf("R/output/cliques_torus_square.pdf", p, width = 0.66)
 
 ######################################################################
 ## plotly plots
-plots <- main_plot(tbl_low %>% filter_generated(rm_square = TRUE),
+plots <- main_plot(tbl_low %>% graph_filter(rm_square = TRUE, rm_het_extreme = TRUE),
     val_title = val, point_size_scale = 3
 )
 ggplotly(plots$p1, tooltip = "text")
@@ -214,7 +221,7 @@ tbl_comp <- tbl %>%
             val <= 1 ~ "at most m cliques"
         )
     ) %>%
-    filter_generated(rm_square = TRUE)
+    graph_filter(rm_square = TRUE)
 
 p <- ggplot(
     tbl_comp,

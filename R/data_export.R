@@ -41,6 +41,12 @@ msg(sprintf(
     tbl %>% filter(!filtered, type == "real") %>% nrow()
 ))
 
+msg(sprintf(
+    "Extreme heterogeneity: %d below lower threshold, %d above higher threshold.",
+    tbl %>% filter(!filtered, type == "real", het < het_extreme_min) %>% nrow(),
+    tbl %>% filter(!filtered, type == "real", het > het_extreme_max) %>% nrow()
+))
+
 tbl <- tbl %>%
     select(
         graph, type, type_detailed, filtered, n, m,
