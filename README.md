@@ -14,7 +14,7 @@ add your own experiments, read the subsequent details on our
 experiment setup.
 
 Additional data can be found on
-[zenodo.org/record/6587324](https://zenodo.org/record/6587324).
+[zenodo.org/record/7243777](https://zenodo.org/record/7243777).
 
 ## Running it in the Docker Container ##
 
