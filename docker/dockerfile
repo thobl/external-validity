@@ -29,7 +29,14 @@ RUN wget http://www.gust.org.pl/projects/e-foundry/latin-modern/download/lm2.004
 
 # R dependencies
 RUN apk add --no-cache R R-dev linux-headers freetype-dev
-RUN R -e 'install.packages(c("ggplot2", "grid", "ggpubr", "egg", "showtext", "xtable", "GGally", "dplyr", "plotly"), repos="https://cloud.r-project.org/")'
+RUN R -e 'install.packages(c("ggplot2"), repos="https://cloud.r-project.org/")'
+RUN R -e 'install.packages(c("ggpubr"), repos="https://cloud.r-project.org/")'
+RUN R -e 'install.packages(c("egg"), repos="https://cloud.r-project.org/")'
+RUN R -e 'install.packages(c("showtext"), repos="https://cloud.r-project.org/")'
+RUN R -e 'install.packages(c("xtable", "plotly"), repos="https://cloud.r-project.org/")'
+RUN R -e 'install.packages(c("GGally"), repos="https://cloud.r-project.org/")'
+RUN R -e 'install.packages(c("dplyr", "plotly"), repos="https://cloud.r-project.org/")'
+RUN R -e 'install.packages(c("plotly"), repos="https://cloud.r-project.org/")'
 
 # check whether R dependencies have been installed correctly
 RUN Rscript R/helper/load_dependencies.R
