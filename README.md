@@ -26,7 +26,7 @@ On the host computer (the one you are running the experiments on), do
 the following to get the container running.
 
 ```terminal
-wget https://zenodo.org/record/6587324/files/ext-val.zip
+wget https://zenodo.org/record/7243777/files/ext_val.zip
 unzip ext_val.zip
 cd ext_val
 ./load.sh
@@ -67,7 +67,7 @@ the following.
   * `setup_data.sh` downloads the network data for running the
     experiments.  Alternatively, you can manually download the
     networks from
-    [zenodo.org/record/6587324/files/input_data.zip](https://zenodo.org/record/6587324/files/input_data.zip)
+    [zenodo.org/record/7243777/files/input_data.zip](https://zenodo.org/record/7243777/files/input_data.zip)
     and unzip them.  Check that the networks are located under
     `data/input_data/raw/`.
   * `run.sh` starts the docker container.  It mounts the host
@@ -140,7 +140,7 @@ The input data is not contained in this repository.  To get the data
 (744 MB) and put it in the right place do the following.
 
 ```terminal
-wget https://zenodo.org/record/6587324/files/input_data.zip
+wget https://zenodo.org/record/7243777/files/input_data.zip
 unzip input_data.zip
 rm input_data.zip
 ```
