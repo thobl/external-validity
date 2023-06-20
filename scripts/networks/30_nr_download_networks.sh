@@ -3561,7 +3561,7 @@ declare -a Networks=(
 
 download() {
     name=$1
-    zip_url=$(curl -s http://networkrepository.com/$name | grep -o "http://nrvis.com/.*zip")
+    zip_url=$(curl -s https://networkrepository.com/$name | grep -o "https\?://nrvis.com/.*zip")
     wget --quiet $zip_url
 }
 
@@ -3574,7 +3574,7 @@ mtx_to_edges() {
 clean_and_move_edge_file() {
     ## remove lines starting with % and replace , or tab with space
     sed '/%/d; s/,/ /g; s/	/ /g' -i $1
-    cut -d " " -f -2 $EDGESFile > ../$TargetDir$EDGESFile
+    cut -d " " -f -2 $EDGESFile > ../$TargetDir$NAME
 }
 
 mkdir tmp
@@ -3617,10 +3617,10 @@ for Network in "${Networks[@]}"; do
 	    mv $TXTFile $NAME.edges
 	fi
 
-	## edgs-file should exist now
+	## edges-file should exist now
 	EDGESFile=$NAME.edges
 	if (test -f $EDGESFile); then
-	    echo "cleaing up	$EDGESFile"
+	    echo "cleaning up	$EDGESFile"
 	    chmod +r $EDGESFile
 	    chmod u+w $EDGESFile
 	    ## only keep the first two columns per line

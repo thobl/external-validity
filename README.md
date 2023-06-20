@@ -14,7 +14,7 @@ add your own experiments, read the subsequent details on our
 experiment setup.
 
 Additional data can be found on
-[zenodo.org/record/7243777](https://zenodo.org/record/7243777).
+[zenodo.org/record/8058432](https://zenodo.org/record/8058432).
 
 ## Running it in the Docker Container ##
 
@@ -26,7 +26,7 @@ On the host computer (the one you are running the experiments on), do
 the following to get the container running.
 
 ```terminal
-wget https://zenodo.org/record/7243777/files/ext_val.zip
+wget https://zenodo.org/record/8058432/files/ext-val.zip
 unzip ext_val.zip
 cd ext_val
 ./load.sh
@@ -67,7 +67,7 @@ the following.
   * `setup_data.sh` downloads the network data for running the
     experiments.  Alternatively, you can manually download the
     networks from
-    [zenodo.org/record/7243777/files/input_data.zip](https://zenodo.org/record/7243777/files/input_data.zip)
+    [zenodo.org/record/8058432/files/input_data.zip](https://zenodo.org/record/8058432/files/input_data.zip)
     and unzip them.  Check that the networks are located under
     `data/input_data/raw/`.
   * `run.sh` starts the docker container.  It mounts the host
@@ -137,10 +137,10 @@ script can find the executables.
 ### Getting the Input Data ###
 
 The input data is not contained in this repository.  To get the data
-(744 MB) and put it in the right place do the following.
+and put it in the right place do the following.
 
 ```terminal
-wget https://zenodo.org/record/7243777/files/input_data.zip
+wget https://zenodo.org/record/8058432/files/input_data.zip
 unzip input_data.zip
 rm input_data.zip
 ```

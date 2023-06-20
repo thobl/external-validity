@@ -1,14 +1,11 @@
 library(igraph)
-source("R/helper/read_data.R")
+source("R/helper/load_helpers.R")
 
 potential_duplicates <- function() {
     ## Read a bunch of statistics for the graphs and group the graphs
     ## with equal statistics.  Returns a list of vectors of graph
     ## names, each vector representing a group.
-    tbl <- join_by_graph(
-        read_clustering_coeff(),
-        read_deg_distr()
-    )
+    tbl <- read_deg_distr() %>% also(read_clustering_coeff())
     tbl_dup <- aggregate(
         graph ~ n + m + clustering_coeff + deg_1_count +
             deg_2_count + avg_deg + max_deg + deg_var +
@@ -29,8 +26,8 @@ is_isom <- function(name1, name2) {
     if (isTRUE(all.equal(readLines(f1), readLines(f2)))) {
         return(TRUE)
     }
-    g1 <- read_graph(f1, "edgelist")
-    g2 <- read_graph(f2, "edgelist")
+    g1 <- read_graph(f1, "edgelist", directed = FALSE)
+    g2 <- read_graph(f2, "edgelist", directed = FALSE)
     graph.isomorphic(g1, g2)
 }
 
@@ -82,12 +79,15 @@ tbl <- read.csv("scripts/networks/data/all_networks.csv")[, c("name", "type")]
 
 ## add types to the network names
 dup_groups <- lapply(dup_groups, FUN = function(x)
-    join(data.frame(name = x), tbl, by = "name", match = "first"))
+    left_join(data.frame(name = x), tbl, by = "name", multiple = "first"))
 
 ## sort by type
 dup_groups <- lapply(dup_groups, FUN = function(x) {
     if (nrow(x[x$type == "misc" & !is.na(x$type), ]) > 0) {
         x[x$type == "misc" & !is.na(x$type), ]$type <- "zzzmisc"
+    }
+    if (nrow(x[x$type == "dynamic" & !is.na(x$type), ]) > 0) {
+        x[x$type == "dynamic" & !is.na(x$type), ]$type <- "zzdynamic"
     }
     x[order(x$type, x$name), ]
 })
@@ -98,3 +98,7 @@ remove <- unlist(sapply(dup_groups, FUN = function(x) x$name[-1]))
 
 write.table(remove, file = "scripts/networks/data/duplicates.txt",
             row.names = FALSE, col.names = FALSE)
+
+write.table(keep, file = "scripts/networks/data/keep.txt",
+            row.names = FALSE, col.names = FALSE)
+

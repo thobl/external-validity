@@ -8,6 +8,8 @@ echo "name,type,n,n_formated,m,m_formated,deg_max,deg_max_formated,deg_avg,deg_a
 sed "s/<\/tr>/<\/tr>\n/g" scripts/networks/data/all_networks_html.txt |
     # remove random networks
     sed "/rand<\/td>/d" |
+    # remove install.log pseudo network
+    sed "/install.log/d" |
     # reduce to relevant matches
     grep -o "sortValue: [0-9.-]*\|[ 0-9a-zA-Z.-]*</td>\|</i>&nbsp; [^<>]*</a>" |
     # remove html stuff
