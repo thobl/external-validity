@@ -16,6 +16,9 @@ experiment setup.
 Additional data can be found on
 [zenodo.org/record/8058432](https://zenodo.org/record/8058432).
 
+An interactive visualization of all data, with ways to flexibly filter
+and download them, can be found at [external-validity.iti.kit.edu](https://external-validity.iti.kit.edu/).
+
 ## Running it in the Docker Container ##
 
 For running the docker container, you of course need docker.
