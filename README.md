@@ -267,6 +267,12 @@ experiments).
 
 ## Changelog ##
 
+### 20.06.2023 Bugfix ###
+
+There was an error in the detection of network duplicates, which meant
+not all network duplicates were properly detected. We updated the 
+detection script and the considered networks.
+
 ### 23.10.2022 Bugfix ###
 
 There was an error in the calculation of the variance of the degree
